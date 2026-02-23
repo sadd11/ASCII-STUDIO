@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII STUDIO</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    
+    <style>
+        :root[data-theme="light"] {
+            --md-sys-color-primary: #4f5b92;
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container: #dee0ff;
+            --md-sys-color-on-primary-container: #00105a;
+            --md-sys-color-surface: #fefbff;
+            --md-sys-color-surface-container: #f3f3f9;
+            --md-sys-color-outline: #767680;
+            --md-sys-color-text-area: #ffffff;
+            --md-sys-color-text-main: #1b1b1f;
+            --md-sys-color-on-surface: #1b1b1f;
+        }
+
+        :root[data-theme="dark"] {
+            --md-sys-color-primary: #bac3ff;
+            --md-sys-color-on-primary: #1e2b61;
+            --md-sys-color-primary-container: #374279;
+            --md-sys-color-on-primary-container: #dee0ff;
+            --md-sys-color-surface: #121318;
+            --md-sys-color-surface-container: #1e1f25;
+            --md-sys-color-outline: #90909a;
+            --md-sys-color-text-area: #000000;
+            --md-sys-color-text-main: #00ff41;
+            --md-sys-color-on-surface: #e3e2e6;
+        }
+
+        body { font-family: 'Roboto', sans-serif; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); margin: 0; padding: 16px; display: flex; justify-content: center; overflow-x: hidden; }
+        .m3-container { display: flex; gap: 24px; max-width: 1100px; width: 100%; }
+        @media (max-width: 850px) { .m3-container { flex-direction: column; align-items: center; } }
+
+        .m3-card { background: var(--md-sys-color-surface-container); border-radius: 28px; padding: 24px; min-width: 320px; width: 100%; max-width: 380px; height: fit-content; box-shadow: 0 1px 3px rgba(0,0,0,0.1); box-sizing: border-box; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 8px; }
+        h1 { font-size: 20px; font-weight: 500; margin: 0; color: var(--md-sys-color-primary); flex-grow: 1; }
+        h2 { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; margin: 24px 0 12px; opacity: 0.7; }
+
+        .m3-btn { 
+            height: 40px; 
+            padding: 0 16px; 
+            border-radius: 20px; 
+            border: 1px solid transparent; 
+            font-weight: 500; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            font-family: inherit; 
+            white-space: nowrap;
+        }
+        
+        .m3-btn-filled { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border: none; }
+        .m3-btn-tonal { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); border: none; }
+        .m3-btn-outline { background: transparent; border: 1px solid var(--md-sys-color-outline); color: var(--md-sys-color-primary); }
+        
+        .preset-btn { 
+            height: 38px; 
+            padding: 0 4px; 
+            font-size: 11px; 
+            border-radius: 12px; 
+            width: 100%; 
+            background: transparent; 
+            color: var(--md-sys-color-on-surface); 
+            border: 1px solid var(--md-sys-color-outline); 
+        }
+
+        .preset-btn.active { 
+            background: var(--md-sys-color-primary) !important;
+            color: var(--md-sys-color-on-primary) !important;
+            border: 2px solid var(--md-sys-color-on-surface) !important;
+        }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .full-width { grid-column: span 2; }
+
+        .control-group { margin-bottom: 20px; width: 100%; }
+        .control-label { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px; }
+        input[type="range"] { width: 100%; accent-color: var(--md-sys-color-primary); cursor: pointer; height: 8px; }
+
+        .preset-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
+        
+        canvas { background: white; border-radius: 20px; width: 100%; max-width: 400px; aspect-ratio: 1; touch-action: none; cursor: crosshair; }
+        
+        #rezylt { 
+            background: var(--md-sys-color-text-area); 
+            color: var(--md-sys-color-text-main); 
+            font-family: 'Courier New', monospace; 
+            font-size: 10px; 
+            line-height: 1; 
+            padding: 20px; 
+            border-radius: 20px; 
+            overflow: auto; 
+            white-space: pre; 
+            min-height: 300px; 
+            width: 100%; 
+            box-sizing: border-box;
+            border: 1px solid var(--md-sys-color-outline);
+        }
+
+        #notification-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 12px; z-index: 10000; }
+        .toast { 
+            position: relative; 
+            min-width: 250px; 
+            background: rgba(45, 47, 54, 0.8);
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 16px; 
+            color: #ffffff; 
+            padding: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+            overflow: hidden; 
+            animation: toast-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+        }
+        .toast-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: var(--md-sys-color-primary); width: 100%; transform-origin: left; animation: shrink 3s linear forwards; }
+        .toast.fade-out { animation: toast-out 0.4s ease forwards !important; }
+        
+        @keyframes shrink { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(40px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: scale(0.8) translateY(-20px); } }
+
+        #fileInput { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="notification-container"></div>
+
+<div class="m3-container">
+    <aside class="m3-card">
+        <div class="header-row">
+            <h1 data-t="title">ASCII Studio</h1>
+            <button class="m3-btn m3-btn-tonal" style="width: 44px; padding: 0; border-radius: 12px;" onclick="toggleLang()">
+                <span id="lang-label" style="font-size: 12px; font-weight: bold;">EN</span>
+            </button>
+            <button class="m3-btn m3-btn-tonal" style="width: 44px; padding: 0; border-radius: 12px;" onclick="toggleTheme()">
+                <span id="theme-icon" class="material-symbols-outlined">light_mode</span>
+            </button>
+        </div>
+        
+        <h2 data-t="h_tools">Инструменты</h2>
+        <div class="btn-grid">
+            <button id="btn-brush" class="m3-btn m3-btn-filled" onclick="colr('black')"><span class="material-symbols-outlined">brush</span></button>
+            <button id="btn-eraser" class="m3-btn m3-btn-outline" onclick="colr('white')"><span class="material-symbols-outlined">ink_eraser</span></button>
+            <button class="m3-btn m3-btn-tonal full-width" onclick="document.getElementById('fileInput').click()">
+                <span class="material-symbols-outlined">image</span> <span data-t="btn_load">Загрузить фото</span>
+            </button>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <h2 data-t="h_settings">Настройки</h2>
+        <div class="control-group">
+            <div class="control-label"><span data-t="l_brush">Размер кисти</span><b id="brushVal">8</b></div>
+            <input type="range" id="brushRange" min="1" max="50" value="8">
+        </div>
+
+        <div class="control-group">
+            <div class="control-label"><span data-t="l_density">Плотность арта</span><b id="densityVal">35</b></div>
+            <input type="range" id="densityRange" min="10" max="80" value="35">
+        </div>
+
+        <div class="preset-grid">
+            <button id="pre-20" class="m3-btn preset-btn" onclick="setPreset(20, 'pre-20')">WhatsApp</button>
+            <button id="pre-28" class="m3-btn preset-btn" onclick="setPreset(28, 'pre-28')">VK</button>
+            <button id="pre-35" class="m3-btn preset-btn" onclick="setPreset(35, 'pre-35')">Telegram</button>
+            <button id="pre-45" class="m3-btn preset-btn" onclick="setPreset(45, 'pre-45')">Discord</button>
+            <button id="pre-50" class="m3-btn preset-btn" onclick="setPreset(50, 'pre-50')">Reddit</button>
+            <button class="m3-btn preset-btn" onclick="resetSettings()" style="border-style: dashed; border-color: var(--md-sys-color-primary);">
+                <span class="material-symbols-outlined" style="font-size: 16px;">restart_alt</span>
+            </button>
+        </div>
+
+        <div class="btn-grid" style="margin-top: 24px;">
+            <button class="m3-btn m3-btn-filled full-width" onclick="copyArt()">
+                <span class="material-symbols-outlined">content_copy</span> <span data-t="btn_copy">Копировать</span>
+            </button>
+            <button class="m3-btn m3-btn-outline full-width" style="color:#ffb4ab" onclick="clearCanvas()">
+                <span class="material-symbols-outlined">delete</span> <span data-t="btn_clear">Очистить</span>
+            </button>
+        </div>
+    </aside>
+
+    <main style="display:flex; flex-direction:column; gap:24px; flex-grow:1; max-width:500px; width:100%;">
+        <canvas id="canv1" width="400" height="400"></canvas>
+        <div id="rezylt" data-t="empty_msg">Начни рисовать...</div>
+    </main>
+</div>
+
+<script>
+    const canvas = document.getElementById('canv1');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const resDiv = document.getElementById('rezylt');
+    let isDrawing = false, lastX = 0, lastY = 0, currentColor = 'black', brushSize = 8;
+    let currentLang = 'ru';
+
+    const translations = {
+        ru: {
+            title: "ASCII Studio", h_tools: "Инструменты", h_settings: "Настройки",
+            btn_load: "Загрузить фото", l_brush: "Размер кисти", l_density: "Плотность арта",
+            btn_copy: "Копировать", btn_clear: "Очистить", empty_msg: "Начни рисовать...",
+            toast_load: "Фото загружено", toast_copy: "Скопировано!", toast_clear: "Очищено", 
+            toast_reset: "Настройки сброшены", preset_msg: "Пресет: "
+        },
+        en: {
+            title: "ASCII Studio", h_tools: "Tools", h_settings: "Settings",
+            btn_load: "Upload Photo", l_brush: "Brush Size", l_density: "Art Density",
+            btn_copy: "Copy", btn_clear: "Clear", empty_msg: "Start drawing...",
+            toast_load: "Photo uploaded", toast_copy: "Copied!", toast_clear: "Cleared", 
+            toast_reset: "Settings reset", preset_msg: "Preset: "
+        }
+    };
+
+    function toggleLang() {
+        currentLang = currentLang === 'ru' ? 'en' : 'ru';
+        document.getElementById('lang-label').innerText = currentLang === 'ru' ? 'EN' : 'RU';
+        document.querySelectorAll('[data-t]').forEach(el => {
+            const key = el.getAttribute('data-t');
+            if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+        });
+        renderASCII();
+    }
+
+    function showToast(msgKey, icon = 'info', isKey = true) {
+        const msg = isKey ? (translations[currentLang][msgKey] || msgKey) : msgKey;
+        const container = document.getElementById('notification-container');
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = `<div style="display:flex;align-items:center;gap:12px;"><span class="material-symbols-outlined">${icon}</span><b>${msg}</b></div><div class="toast-bar"></div>`;
+        container.appendChild(t);
+        setTimeout(() => {
+            t.classList.add('fade-out');
+            t.addEventListener('animationend', (e) => { if(e.animationName === 'toast-out') t.remove(); });
+        }, 3000);
+    }
+
+    function toggleTheme() {
+        const h = document.documentElement;
+        const next = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        h.setAttribute('data-theme', next);
+        document.getElementById('theme-icon').innerText = next === 'light' ? 'dark_mode' : 'light_mode';
+    }
+
+    function clearCanvas() {
+        ctx.fillStyle = 'white'; ctx.fillRect(0, 0, 400, 400); 
+        renderASCII();
+        showToast('toast_clear', 'delete_sweep');
+    }
+    ctx.fillStyle = 'white'; ctx.fillRect(0, 0, 400, 400);
+
+    function resetSettings() {
+        brushSize = 8;
+        document.getElementById('brushRange').value = 8;
+        document.getElementById('brushVal').innerText = 8;
+        
+        document.getElementById('densityRange').value = 35;
+        document.getElementById('densityVal').innerText = 35;
+        
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        colr('black');
+        renderASCII();
+        showToast('toast_reset', 'restart_alt');
+    }
+
+    document.getElementById('fileInput').onchange = function(e) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                ctx.fillStyle = 'white'; ctx.fillRect(0,0,400,400);
+                const scale = Math.min(400/img.width, 400/img.height);
+                const x = (400 - img.width*scale)/2; const y = (400 - img.height*scale)/2;
+                ctx.drawImage(img, x, y, img.width*scale, img.height*scale);
+                renderASCII();
+                showToast('toast_load', 'image');
+            }
+            img.src = event.target.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    function setPreset(val, btnId) {
+        document.getElementById('densityRange').value = val;
+        document.getElementById('densityVal').innerText = val;
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(btnId).classList.add('active');
+        renderASCII();
+        const pName = document.getElementById(btnId).innerText;
+        showToast(translations[currentLang].preset_msg + pName, 'tune', false);
+    }
+
+    function getCoords(e) {
+        const r = canvas.getBoundingClientRect();
+        const cx = e.touches ? e.touches[0].clientX : e.clientX;
+        const cy = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: (cx - r.left) * (400 / r.width), y: (cy - r.top) * (400 / r.height) };
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        const c = getCoords(e);
+        ctx.lineWidth = brushSize; ctx.lineCap = 'round'; ctx.strokeStyle = currentColor;
+        ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(c.x, c.y); ctx.stroke();
+        [lastX, lastY] = [c.x, c.y];
+        renderASCII();
+    }
+
+    canvas.addEventListener('mousedown', (e) => { isDrawing = true; const c = getCoords(e); [lastX, lastY] = [c.x, c.y]; });
+    window.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); isDrawing = true; const c = getCoords(e); [lastX, lastY] = [c.x, c.y]; });
+    canvas.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+
+    document.getElementById('brushRange').oninput = function() {
+        brushSize = this.value; document.getElementById('brushVal').innerText = this.value;
+    };
+    
+    document.getElementById('densityRange').oninput = function() {
+        document.getElementById('densityVal').innerText = this.value;
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        renderASCII();
+    };
+
+    function renderASCII() {
+        const density = parseInt(document.getElementById('densityRange').value);
+        const chars = ['█', '▓', '▒', '░', '⠀']; 
+        let otvet = '';
+        const stepX = 400 / density;
+        const stepY = stepX * 2; 
+        const rows = Math.floor(400 / stepY);
+        const imageData = ctx.getImageData(0, 0, 400, 400).data;
+
+        for (let q = 0; q < rows; q++) {
+            for (let w = 0; w < density; w++) {
+                let totalBrightness = 0, count = 0;
+                for (let py = Math.floor(q * stepY); py < (q + 1) * stepY; py++) {
+                    for (let px = Math.floor(w * stepX); px < (w + 1) * stepX; px++) {
+                        const idx = (py * 400 + px) * 4;
+                        totalBrightness += (imageData[idx] + imageData[idx+1] + imageData[idx+2]) / 3;
+                        count++;
+                    }
+                }
+                const avg = totalBrightness / count;
+                if (avg < 127) otvet += chars[0];
+                else if (avg < 180) otvet += chars[1];
+                else if (avg < 210) otvet += chars[2];
+                else if (avg < 240) otvet += chars[3];
+                else otvet += chars[4];
+            }
+            otvet += '\n';
+        }
+        resDiv.innerText = otvet;
+    }
+
+    function copyArt() { 
+        if (resDiv.innerText.length < 5) return;
+        const finalContent = "```\n" + resDiv.innerText + "\n```";
+        navigator.clipboard.writeText(finalContent).then(() => {
+            showToast('toast_copy', 'content_copy');
+        }); 
+    }
+
+    function colr(c) { 
+        currentColor = c; 
+        document.getElementById('btn-brush').className = c === 'black' ? 'm3-btn m3-btn-filled' : 'm3-btn m3-btn-outline';
+        document.getElementById('btn-eraser').className = c === 'white' ? 'm3-btn m3-btn-filled' : 'm3-btn m3-btn-outline';
+    }
+</script>
+
+</body>
+</html>
+
